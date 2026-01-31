@@ -95,9 +95,7 @@ if st.session_state.df is not None:
     
     #Handling missing values
 
-    st.write("After filling missing values:")
-
-      # initial dataframe
+    st.write("After filling missing values:") 
     st.session_state.df = fill_missing_values(st.session_state.df)
     st.dataframe(st.session_state.df)
 
@@ -124,17 +122,13 @@ if st.session_state.df is not None:
     #Splitting x and y
 
     if fileType=="regression":
-        x,y=split_x_y_regression(st.session_state.df)
+        st.session_state.x,st.session_state.y=split_x_y_regression(st.session_state.df)
 
     if fileType=="Classification":
         st.session_state.x,st.session_state.y=split_x_y_classification(st.session_state.df)
-    #else:
-        #x,y=split_x_y_regression(df)
 
     st.write("x:",st.session_state.x) 
     st.write("y:",st.session_state.y)
-
-    #Splitting training and testing data
 
     x_train,x_test,y_train,y_test=split_train_test(st.session_state.x,st.session_state.y,test_size=0.3)
     
