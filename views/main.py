@@ -15,19 +15,23 @@ from preprocessing import accuracy
 from preprocessing import meanAbsoluteError,meanAbsolutePercentageError
 from preprocessing import meanSquaredError,rootMeanSquaredError,r_score
 from preprocessing import create_polynomial_regression_model
+from preprocessing import create_decision_tree_regressor_model,create_decison_tree_classifier_model
+from preprocessing import create_random_forest_classifier_model,create_random_forest_regressor_model
 
 st.title("🏠 Dataset Upload & Training")
 st.caption("Upload your data and train models automatically")
 
 with st.expander("Supported Models"):
-    st.write("""
-    • KNN  
-    • Naive Bayes  
-    • SVM  
-    • Simple Linear Regression  
-    • Multiple Linear Regression  
-    • Polynomial Regression
+    st.markdown("""
+    - KNN
+    - Naive Bayes
+    - SVM
+    - Simple Linear Regression
+    - Multiple Linear Regression
+    - Polynomial Regression
+    - Decision Tree
     """)
+
 
 flag=1
 if "flag" not in st.session_state:
@@ -110,13 +114,21 @@ if st.session_state.df is not None:
     for i in st.session_state.x:
         if st.session_state.df[i].dtypes=='O':
             columns_to_encode.append(i)
+    st.session_state.columns_to_encode = columns_to_encode
     st.write("Columns to encode:",columns_to_encode)                    #columns name not showing
-    st.session_state.x=default_encode(st.session_state.x,columns_to_encode)
+    st.session_state.x=default_encode(st.session_state.x,st.session_state.columns_to_encode)
     st.write("After encoding:")
     st.dataframe(st.session_state.x)
     st.caption("Encoded using One Hot Encoding")
 
     st.divider()
+
+    #Label Encoding
+
+    if st.button("Use Label Encoding"):
+        st.session_state.x=label_encode_column(st.session_state.df,st.session_state.columns_to_encode)
+        st.write("After Label Encoding")
+        st.dataframe(st.session_state.df)
 
     #Splitting x and y
 
@@ -198,6 +210,16 @@ if st.session_state.df is not None:
             model = create_svm_model(st.session_state.x_train, st.session_state.y_train)
             st.session_state.model = model
             st.success("SVM model trained")
+        
+        if st.button("Train Decision tree"):
+            model=create_decison_tree_classifier_model(st.session_state.x_train,st.session_state.y_train)
+            st.session_state.model=model
+            st.success("Decision Tree model trained")
+
+        if st.button("Train Random Forest"):
+            model=create_random_forest_classifier_model(st.session_state.x_train,st.session_state.y_train)
+            st.session_state.model=model
+            st.success("Random Forest model trained")
 
     else:
 
@@ -207,6 +229,10 @@ if st.session_state.df is not None:
             )
             st.session_state.model = model
             st.success("Linear Regression model trained")
+            model_coef=st.session_state.model.coef_
+            st.write(f"The model coefficient {model_coef}")
+            model_intercept=st.session_state.model.intercept_
+            st.write(f"The model intercept is {model_intercept}")
 
         if st.button("Train Polynomial Regression Model"):
             st.session_state.x1=create_polynomial_regression_model(st.session_state.x)
@@ -216,6 +242,20 @@ if st.session_state.df is not None:
             )
             st.session_state.model=model
             st.success("Polynomial Regression model trained")
+            model_coef=st.session_state.model.coef_
+            st.write(f"The model coefficient {model_coef}")
+            model_intercept=st.session_state.model.intercept_
+            st.write(f"The model intercept is {model_intercept}")
+        
+        if st.button("Train Decision Tree Model"):
+            model=create_decision_tree_regressor_model(st.session_state.x_train,st.session_state.y_train)
+            st.session_state.model=model
+            st.success("Decision Tree Model Trained")
+
+        if st.button("Train Random Forest"):
+            model=create_random_forest_regressor_model(st.session_state.x_train,st.session_state.y_train)
+            st.session_state.model=model
+            st.success("Random Forest model trained")
 
             
     # Model Output
@@ -257,11 +297,6 @@ if st.session_state.df is not None:
             st.write(f"Root mean squared error is {rmse}")
             st.write(f"r_2 score is {r2}")
 
-            model_coef=st.session_state.model.coef_
-            st.write(f"The model coefficient {model_coef}")
-
-            model_intercept=st.session_state.model.intercept_
-            st.write(f"The model intercept is {model_intercept}")
 
         st.write("Results DataFrame:")
         st.dataframe(results_df)

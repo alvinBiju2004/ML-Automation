@@ -20,18 +20,13 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
-
+if "raw_df" in st.session_state:
+    raw_df = st.session_state.raw_df
 def label_encode_column(df, columns):
-    # Safety check
-    if not isinstance(df, pd.DataFrame):
-        raise TypeError("label_encode_column expects a pandas DataFrame")
-
-    df = df.copy()
-
-    for col in columns:
-        if col in df.columns and df[col].dtype == "O":
+    for i in columns:
+        if df[i].dtype == "O":
             le = LabelEncoder()
-            df[col] = le.fit_transform(df[col].astype(str))
+            df[i] = le.fit_transform(df[i])
 
     return df
 
@@ -106,6 +101,21 @@ def create_svm_model(x_train,y_train):
     svm.fit(x_train,y_train)
     return svm
 
+#Decision Tree Classification
+from sklearn.tree import DecisionTreeClassifier
+def create_decison_tree_classifier_model(x_train,y_train):
+    model=DecisionTreeClassifier(criterion='entropy')
+    model.fit(x_train,y_train)
+    return model
+
+#Random Forest Classifier
+from sklearn.ensemble import RandomForestClassifier 
+def create_random_forest_classifier_model(x_train,y_train):
+    model=RandomForestClassifier()
+    model.fit(x_train,y_train)
+    return model
+
+
 # Simple Linear Regression
 from sklearn.linear_model import LinearRegression
 def create_linear_regression_model(x_train,y_train):
@@ -118,6 +128,20 @@ from sklearn.preprocessing import PolynomialFeatures
 def create_polynomial_regression_model(x):
     poly=PolynomialFeatures(degree=2)
     x=poly.fit_transform(x)
+
+#Decision Tree Regression
+from sklearn.tree import DecisionTreeRegressor
+def create_decision_tree_regressor_model(x_train,y_train):
+    model=DecisionTreeRegressor()
+    model.fit(x_train,y_train)
+    return model
+
+#Random Forest Classifier
+from sklearn.ensemble import RandomForestRegressor
+def create_random_forest_regressor_model(x_train,y_train):
+    model=RandomForestRegressor()
+    model.fit(x_train,y_train)
+    return model
 
 # Confusin metrix
 from sklearn.metrics import confusion_matrix
